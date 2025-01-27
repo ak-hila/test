@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit Data to Google Sheets</title>
+</head>
+<body>
+  <h1>Submit Your Info</h1>
+  <form id="dataForm">
+    <label for="id">ID:</label>
+    <input type="text" id="id" required><br><br>
+
+    <label for="name">Name:</label>
+    <input type="text" id="name" required><br><br>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" required><br><br>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <h2>Submitted Data:</h2>
+  <ul id="dataList"></ul>
+
+  <script>
+    // Replace this with your Google Apps Script web app URL
+    const apiUrl = 'YOUR_WEB_APP_URL'; // e.g., https://script.google.com/macros/s/XXXXXX/exec
+
+    // Fetch existing data from Google Sheets
+    async function fetchData() {
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+      const dataList = document.getElementById('dataList');
+      dataList.innerHTML = ''; // Clear existing list
+
+      data.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = `ID: ${item.ID}, Name: ${item.Name}, Email: ${item.Email}`;
+        dataList.appendChild(li);
+      });
+    }
+
+    // Submit form data to Google Sheets
+    document.getElementById('dataForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const id = document.getElementById('id').value;
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+
+      const data = { ID: id, Name: name, Email: email };
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        fetchData(); // Reload the list
+        alert('Data submitted successfully!');
+      } else {
+        alert('Error submitting data');
+      }
+    });
+
+    // Fetch and display data on page load
+    fetchData();
+  </script>
+</body>
+</html>
